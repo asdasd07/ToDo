@@ -10,62 +10,111 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="ToDo" Height="610" Width="800">
 
-    <Grid MinWidth="200" MinHeight="200">
+    <Grid MinWidth="200" MinHeight="200" Background="#FF363636">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <Grid Grid.Column="1" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+            <CheckBox x:Name="DayCheckbox" Content="Filter by Day" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Click="DayFilter_Click" BorderBrush="{x:Null}" Foreground="White" Background="White"/>
+
+            <Grid Grid.Row="0" Margin="0,40,10,0">
+                <Grid.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF464646" Offset="0"/>
+                        <GradientStop Color="#FF515151" Offset="0.15"/>
+                        <GradientStop Color="#FF989CA0" Offset="0.28"/>
+                        <GradientStop Color="#FF575757" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Button  Content='&lt;' Click="SubMonth_Click" Background="{x:Null}" BorderBrush="#FF707070" Foreground="White" Margin="0" HorizontalAlignment="Left" Width="30" />
+                <Label x:Name="CalendarMonth" Foreground="White" FontSize="12" FontWeight="light" Width="Auto" Height="Auto" Margin="0,-5" Content="Styczeń" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <Button  Content='&gt;' Click="AddMonth_Click" Background="{x:Null}" Foreground="White" Margin="0" HorizontalAlignment="Right" Width="30" />
+
+                <Grid Grid.Row="1" Name="calendarGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="14" />
+                        <ColumnDefinition Name="col0"/>
+                        <ColumnDefinition Name="col1"/>
+                        <ColumnDefinition Name="col2"/>
+                        <ColumnDefinition Name="col3"/>
+                        <ColumnDefinition Name="col4"/>
+                        <ColumnDefinition Name="col5"/>
+                        <ColumnDefinition Name="col6"/>
+                        <ColumnDefinition Width="14" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition Name="row0" />
+                        <RowDefinition Name="row1" />
+                        <RowDefinition Name="row2" />
+                        <RowDefinition Name="row3" />
+                        <RowDefinition Name="row4" />
+                        <RowDefinition Name="row5" />
+                        <RowDefinition Height="14"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="1" Grid.Row="0" Height="18" Width="25" Text="pon" VerticalAlignment="Top"/>
+                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="2" Grid.Row="0" Height="18" Width="20" Text="wt"  VerticalAlignment="Top"/>
+                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="3" Grid.Row="0" Height="18" Width="20" Text="śr"  VerticalAlignment="Top"/>
+                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="4" Grid.Row="0" Height="18" Width="25" Text="czw" VerticalAlignment="Top"/>
+                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="5" Grid.Row="0" Height="18" Width="25" Text="pią" VerticalAlignment="Top"/>
+                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="6" Grid.Row="0" Height="18" Width="25" Text="sob" VerticalAlignment="Top"/>
+                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="7" Grid.Row="0" Height="18" Width="25" Text="nie" VerticalAlignment="Top"/>
+                </Grid>
+            </Grid>
+            <Grid x:Name="gEdit" Visibility="Visible" Grid.Row="1" MinHeight="285">
+                <TextBox x:Name="CDesc" MinWidth="50"  Margin="20,160,10,50" TextWrapping="Wrap" Text="TextBox" VerticalScrollBarVisibility="Auto" SpellCheck.IsEnabled="True" AcceptsTab="True" AcceptsReturn="True" BorderBrush="{x:Null}" Background="#FFA2A2A2" Foreground="Black"/>
+                <TextBox x:Name="CTitle" TextWrapping="Wrap" Text="TextBox" AutomationProperties.IsColumnHeader="True" Margin="70,45,20,0" VerticalAlignment="Top" MaxLength="30" MaxLines="1" Background="White"/>
+                <TextBox x:Name="EdDeadline" Text="TextBox" Margin="70,105,20,0" VerticalAlignment="Top" MaxLength="30" MaxLines="1" Background="White"/>
+                <ComboBox x:Name="Combo" IsEditable="True" Margin="70,72,20,0" VerticalAlignment="Top"  Background="#FFA2A2A2"/>
+                <Button Content="Cancel" Width="75" Click="Cancel_Click" Margin="20,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                <Button x:Name="CreateButton" Content="Create" Width="75" Click="Create_Click" Margin="20,40,20,5" HorizontalAlignment="Right" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                <Button x:Name="SubmitButton" Content="Submit" Width="75" Click="Submit_Click" Margin="20,40,20,5" HorizontalAlignment="Right" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                </Grid>
+            <Grid x:Name="gLabels" Visibility="Visible" Grid.Row="1" Margin="0" MinHeight="250">
+                <Label Content="Title" Margin="0,40,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
+                <Label Content="Group" Margin="0,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
+                <Label Content="Deadline" Margin="0,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
+                <Label Content="Description:" Margin="0,130,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
+                <CheckBox x:Name="shdone" Content="Done" Margin="0,15,20,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Click="Shdone_Click" Foreground="White"/>
+            </Grid>
+
+            <Grid x:Name="gView" Visibility="Hidden" Grid.Row="1" MinHeight="250">
+                <ScrollViewer Margin="20,160,10,60" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="shDesc" TextWrapping="Wrap" Foreground="White" Margin="0,0,0,5"/>
+                </ScrollViewer>
+                <Label x:Name="shTitle" Margin="70,40,20,0" VerticalAlignment="Top" Foreground="White"/>
+                <Label x:Name="shgroup" Margin="70,70,20,0" VerticalAlignment="Top" Foreground="White"/>
+                <Label x:Name="shDeadline" Margin="70,100,20,0" VerticalAlignment="Top" Foreground="White"/>
+                <Button x:Name="Edit" Content="Edit" Width="75" Margin="20,30,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="Edit_Click"/>
+            </Grid>
 
 
-        <Grid x:Name="grid1" Grid.ColumnSpan="1" Margin="0,0,0,0" Grid.Column="0" RenderTransformOrigin="0.513,0.362">
+        </Grid>
+
+        <Grid x:Name="grid1" Grid.ColumnSpan="1" Margin="0" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <ListBox x:Name="LiBox" Margin="20,10,20,60" Padding="0" MinWidth="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" MinHeight="200" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionChanged="LiBox_SelectionChanged" Grid.Row="1" Grid.RowSpan="2" Focusable="False"/>
-            <Button x:Name="Add" Content="Add" HorizontalAlignment="Right" Margin="0,0,20,20" VerticalAlignment="Bottom" Width="75" Click="Add_Click" Grid.Row="1" Grid.RowSpan="2"/>
-            <Button x:Name="Del" Content="Delete" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="Del_Click" Margin="20,0,0,20" Grid.Row="1" Grid.RowSpan="2"/>
-            <ComboBox x:Name="Com" Width="179" Margin="0,10,20,0" HorizontalAlignment="Right" VerticalAlignment="Top" SelectionChanged="Com_SelectionChanged"/>
-            <Calendar x:Name="Calendar" HorizontalAlignment="Right" Margin="0,50,20,0" VerticalAlignment="Top" RenderTransformOrigin="0.5,0.5" SelectedDatesChanged="Refresh_Click" Visibility="Collapsed" IsTabStop="False" Focusable="False" ForceCursor="True"/>
-            <Label Content="Filter by Group" HorizontalAlignment="Left" Margin="20,10,0,0" VerticalAlignment="Top"/>
-            <Label Content="Filter by Day" HorizontalAlignment="Left" Margin="20,50,0,0" VerticalAlignment="Top"/>
-            <CheckBox x:Name="DayCheckbox" Content="" HorizontalAlignment="Left" Margin="105,55,0,0" VerticalAlignment="Top" Click="DayFilter_Click"/>
-        </Grid>
 
-        <Grid x:Name="grid2" Grid.ColumnSpan="2" Margin="0,0,0,0" Grid.Column="1" Visibility="Hidden">
-            <RichTextBox x:Name="CDesc" MinWidth="50" Padding="0" Margin="25,180,20,60" SpellCheck.IsEnabled="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto">
-                <FlowDocument>
-                    <Paragraph>
-                        <Run Text="asdads"/>
-                    </Paragraph>
-                </FlowDocument>
-            </RichTextBox>
-            <Label Content="Title" Margin="20,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <CheckBox x:Name="done" Content="Done" Margin="0,16,20,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right"/>
-            <TextBox x:Name="CTitle"  TextWrapping="Wrap" Text="TextBox" AutomationProperties.IsColumnHeader="True" Margin="90,16,80,0" VerticalAlignment="Top" MaxLength="30" MaxLines="1"/>
-            <ComboBox x:Name="Combo" Width="220" IsEditable="True" Margin="90,60,20,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Button Content="Cancel" Width="75" Click="Cancel_Click" Margin="20,0,0,20" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
-            <Button x:Name="CreateButton" Content="Create" Width="75" Click="Create_Click" Margin="0,0,20,20" HorizontalAlignment="Right" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-            <Button x:Name="SubmitButton" Content="Submit" Width="75" Click="Submit_Click" Margin="0,0,20,20" HorizontalAlignment="Right" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-            <Label Content="Group" Margin="22,55,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Label Content="Deadline" Margin="20,105,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Label Content="Description" Margin="20,154,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <DatePicker x:Name="Deadline" HorizontalAlignment="Left" Margin="90,105,0,0" VerticalAlignment="Top" Width="220" SelectedDateFormat="Long"/>
-        </Grid>
+            <ListBox x:Name="LiBox" Margin="10,5,10,50" Padding="0" MinWidth="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" MinHeight="200" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionChanged="LiBox_SelectionChanged" Grid.Row="1" Grid.RowSpan="2" Focusable="False" Background="#FFA2A2A2" BorderBrush="{x:Null}"/>
+            <Button x:Name="Add" Content="Add" HorizontalAlignment="Right" Margin="0,0,20,10" VerticalAlignment="Bottom" Width="75" Click="Add_Click" Grid.Row="1" Grid.RowSpan="2"/>
+            <Button x:Name="Del" Content="Delete" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="Del_Click" Margin="20,0,0,10" Grid.Row="1" Grid.RowSpan="2"/>
+            <ComboBox x:Name="Com" Width="140" Margin="0,10,10,0" HorizontalAlignment="Right" VerticalAlignment="Top" SelectionChanged="Com_SelectionChanged" Background="#FFA2A2A2"/>
+            <Label Content="Filter by Group" HorizontalAlignment="Left" Margin="10,10,0,5" VerticalAlignment="Top" Foreground="White"/>
+            </Grid>
 
-        <Grid x:Name="shgrid" Grid.ColumnSpan="2" Margin="0,0,0,0" Grid.Column="1">
-            <ScrollViewer Margin="30,180,20,60" VerticalScrollBarVisibility="Auto">
-                <TextBlock x:Name="shDesc" TextWrapping="Wrap"/>
-            </ScrollViewer>
-            <Label Content="Title" Margin="20,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Label x:Name="shTitle" Content="" Margin="90,10,80,0" VerticalAlignment="Top"/>
-            <Label x:Name="shgroup" Content="" Margin="90,55,80,0" VerticalAlignment="Top"/>
-            <Label x:Name="shDeadline" Content="" Margin="90,105,80,0" VerticalAlignment="Top"/>
-            <CheckBox x:Name="shdone" Content="Done" Margin="0,16,20,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Click="Shdone_Click"/>
-            <Button x:Name="Edit" Content="Edit" Width="75" Margin="20,0,0,20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="Edit_Click"/>
-            <Label Content="Group" Margin="22,55,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Label Content="Deadline" Margin="20,105,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <Label Content="Description" Margin="20,154,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-        </Grid>
+
     </Grid>
 </Window>

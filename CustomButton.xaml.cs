@@ -11,6 +11,7 @@ namespace ToDo {
         public string title = "", description = "", group = "";
         public DateTime creation, end, deadline;
         public bool complete;
+
         public CustomButton() {
             InitializeComponent();
         }
@@ -34,6 +35,8 @@ namespace ToDo {
             tex.Text = description;
             if (complete) {
                 Background = new SolidColorBrush(Colors.Gray) { Opacity = 0.5 };
+            } else {
+                Background = Tools.getTaskBrush(groupID, id);
             }
         }
     }

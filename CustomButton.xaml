@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ToDo"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="200">
-    <Grid Margin="0,0,0,0" Height="80" Background="#190A0A0A">
+             d:DesignHeight="100" d:DesignWidth="200" BorderBrush="#00000000" Margin="0" BorderThickness="3">
+    <Grid Margin="0" Background="#190A0A0A">
         <Label x:Name="L1" Content="L1" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" FontWeight="Bold"/>
         <Label x:Name="L2" Content="L2" HorizontalAlignment="Right" Margin="0,5,5,0" VerticalAlignment="Top" HorizontalContentAlignment="Right"/>
         <Label x:Name="L3" Content="L3" HorizontalAlignment="Right" Margin="0,30,5,0" VerticalAlignment="Top" HorizontalContentAlignment="Right"/>

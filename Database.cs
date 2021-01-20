@@ -16,7 +16,7 @@ namespace ToDo {
                 myConnection = new SQLiteConnection("Data Source=ToDoBase.db");
                 OpenConnection();
 
-                string query = "CREATE TABLE Groups (ID INTEGER PRIMARY KEY AUTOINCREMENT,Name TEXT NOT NULL)";
+                string query = "CREATE TABLE Groups (ID INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL)";
                 SQLiteCommand myCommand = new SQLiteCommand(query, myConnection);
                 myCommand.ExecuteNonQuery();
 
@@ -182,6 +182,22 @@ namespace ToDo {
             SQLiteCommand myCommand = new SQLiteCommand(query, myConnection);
             if (GID != 0) myCommand.Parameters.AddWithValue("@Gid", GID);
             if (day != null) myCommand.Parameters.AddWithValue("@Day", day);
+            OpenConnection();
+            SQLiteDataReader result = myCommand.ExecuteReader();
+            return result;
+        }
+
+        public SQLiteDataReader Select(int GID, int month, int year) {
+            DateTime begin = new DateTime(year, month, 1);
+            DateTime end = begin.AddMonths(1);
+            string query = "SELECT tasks.id,Title,Description,CreationDate,EndDate,Deadline,Complete,GroupID,name FROM tasks, groups WHERE GroupID=groups.id";
+            if (GID != 0) query += " and groupID=@Gid";
+            query += " and Deadline BETWEEN date(@BeginDate) and date(@EndDate,'+1 day')";
+            query += " order by Complete, Deadline";
+            SQLiteCommand myCommand = new SQLiteCommand(query, myConnection);
+            if (GID != 0) myCommand.Parameters.AddWithValue("@Gid", GID);
+            myCommand.Parameters.AddWithValue("@BeginDate", begin);
+            myCommand.Parameters.AddWithValue("@EndDate", end);
             OpenConnection();
             SQLiteDataReader result = myCommand.ExecuteReader();
             return result;

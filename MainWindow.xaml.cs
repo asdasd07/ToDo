@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace ToDo {
     /// <summary>
@@ -13,9 +16,19 @@ namespace ToDo {
         Database dataObject;
         Dictionary<int, string> groups = new Dictionary<int, string>();
         CustomButton Selected;
-        DateTime? DayFilter;
+        DateTime DayFilter = DateTime.Today;
         bool DayFilterOn = false;
         int filter = 0;
+        enum Mode { Hide, View, Edit };
+
+        int prevMonthCount;
+        int monthOffset = 0;
+        public DateTime selectedMonth;
+        private int daysInMonth;
+        private int firstDayOfWeek;
+        private List<Button> dayList = new List<Button>();
+        List<CustomButton> Tasks = new List<CustomButton>();
+
 
         /// <summary>
         /// MainWindow constructor
@@ -23,18 +36,18 @@ namespace ToDo {
         public MainWindow() {
             InitializeComponent();
             dataObject = new Database();
-            Refresh_Click();
+            CreateMonth();
+            RefreshGroups();
         }
         /// <summary>
         /// Refresh whole window
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Refresh_Click(object sender = null, RoutedEventArgs e = null) {
+        private void Refresh() {
             RefreshGroups();
             RefreshTask();
-            grid2.Visibility = Visibility.Hidden;
-            shgrid.Visibility = Visibility.Hidden;
+            ChangeMode(Mode.Hide);
         }
         /// <summary>
         /// Get fresh info about Tasks from database and put them into ListBox
@@ -42,22 +55,125 @@ namespace ToDo {
         public void RefreshTask() {
             dataObject.OpenConnection();
             LiBox.Items.Clear();
-            if (DayFilterOn) {
-                DayFilter = Calendar.SelectedDate;
-            } else {
-                DayFilter = null;
-            }
+            System.Data.SQLite.SQLiteDataReader data = dataObject.Select(filter, selectedMonth.Month, selectedMonth.Year);
 
-            System.Data.SQLite.SQLiteDataReader data = dataObject.Select(filter, DayFilter);
-
-            if (data.HasRows) {
+            Tasks.Clear();
+            LiBox.Items.Clear();
+            if (data != null && data.HasRows) {
                 while (data.Read()) {
-                    CustomButton b = new CustomButton(data);
-                    LiBox.Items.Add(b);
+                    Tasks.Add(new CustomButton(data));
+                }
+                foreach (CustomButton b in Tasks) {
+                    if (!DayFilterOn || DayFilterOn && DayFilter.Day == b.deadline.Day) {
+                        LiBox.Items.Add(b);
+                    }
                 }
             }
             dataObject.CloseConnection();
+            UpdateCalendar();
         }
+        public void CreateMonth() {
+            selectedMonth = DateTime.Today.AddMonths(monthOffset);
+            daysInMonth = DateTime.DaysInMonth(selectedMonth.Year, selectedMonth.Month);
+            DateTime firstDay = new DateTime(selectedMonth.Year, selectedMonth.Month, 1);
+            firstDayOfWeek = (int)firstDay.DayOfWeek;
+            DateTime prevMonth = DateTime.Today.AddMonths(monthOffset - 1);
+            prevMonthCount = DateTime.DaysInMonth(prevMonth.Year, prevMonth.Month);
+
+            calendarGrid.Children.RemoveRange(7, calendarGrid.Children.Count - 7);
+            dayList.Clear();
+
+            int offset = (firstDayOfWeek + 6) % 7;
+            offset = offset == 0 ? 6 : offset - 1;
+            int day = prevMonthCount - offset;
+            bool part = false;
+            for (int row = 0; row < 6; row++) {
+                for (int col = 0; col < 7; col++) {
+                    DayButton(col, row, day, part);
+                    if (day == daysInMonth && part || day == prevMonthCount && !part) {
+                        day = 0;
+                        part = !part;
+                    }
+                    day++;
+                }
+            }
+            CalendarMonth.Content = selectedMonth.ToString("MMMM yyyy");
+        }
+
+        private void DayButton(int col, int row, int day, bool enable) {
+            Button btn = new Button {
+                FontSize = 10,
+                FontWeight = FontWeights.Light,
+                Name = "Button" + day,
+                Margin = new Thickness(1, 1, 1, 1),
+                IsHitTestVisible = enable,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0)
+            };
+            btn.Click += SelectDay_Click;
+            Grid.SetRow(btn, row + 1);
+            Grid.SetColumn(btn, col + 1);
+
+            CustomCalendarDay customCalendarDay = new CustomCalendarDay();
+            btn.Content = customCalendarDay;
+            btn.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+            btn.VerticalContentAlignment = VerticalAlignment.Stretch;
+            calendarGrid.Children.Add(btn);
+            Label label = (Label)((Grid)customCalendarDay.Content).Children[1];
+            label.Content = day;
+            label.Foreground = enable ? Brushes.White : Brushes.LightGray;
+            if (enable) {
+                dayList.Insert(day, btn);
+            } else {
+                dayList.Add(btn);
+            }
+        }
+
+        private void UpdateCalendar() {
+            for (int i = 1; i <= daysInMonth; i++) {
+                DateTime date = new DateTime(selectedMonth.Year, selectedMonth.Month, i);
+                List<CustomButton> t = Tasks.FindAll(x => x.deadline.Date == date.Date && x.complete == false);
+
+                int cols = (int)Math.Ceiling(Math.Sqrt(t.Count));
+                int rows = (int)Math.Ceiling((float)t.Count / cols);
+
+                CustomCalendarDay customCalendarDay = (CustomCalendarDay)dayList[i].Content;
+                Grid group = (Grid)customCalendarDay.Content;
+                group.Children.RemoveAt(0);
+
+                Grid grid = new Grid();
+                for (int j = 0; j < cols; j++) {
+                    grid.ColumnDefinitions.Add(new ColumnDefinition());
+                }
+                for (int j = 0; j < rows; j++) {
+                    grid.RowDefinitions.Add(new RowDefinition());
+                }
+                for (int j = 0; j < t.Count; j++) {
+                    var r = new Rectangle { Fill = Tools.getTaskBrush(t[j].groupID, t[j].id) };
+                    r.SetValue(Grid.ColumnProperty, j % cols);
+                    r.SetValue(Grid.RowProperty, j / cols);
+                    grid.Children.Add(r);
+                }
+                group.Children.Insert(0, grid);
+            }
+            HighlightButton();
+        }
+
+        public void HighlightButton() {
+            foreach (Button b in dayList) {
+                b.BorderThickness = new Thickness(0);
+            }
+            if (selectedMonth.Month == DateTime.Now.Month) {
+                Button b = dayList[DateTime.Now.Day];
+                b.BorderThickness = new Thickness(1);
+                b.BorderBrush = Brushes.White;
+            }
+            Button btn = dayList[DayFilter.Day];
+            btn.BorderThickness = new Thickness(1);
+            btn.BorderBrush = Brushes.Blue;
+        }
+
+
         /// <summary>
         /// Get fresh info about Groups from database and put them into ComboBoxes
         /// </summary>
@@ -87,11 +203,14 @@ namespace ToDo {
         /// </summary>
         private void LiBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             ListBox so = (ListBox)sender;
-            Selected = (CustomButton)so.SelectedItem;
-            if (Selected == null) {
-                return;
+            if (Selected != null) {
+                Selected.BorderBrush = Brushes.Transparent;
             }
-            EnterDetails(Selected);
+            Selected = (CustomButton)so.SelectedItem;
+            if (Selected != null) {
+                Selected.BorderBrush = Brushes.CornflowerBlue;
+                EnterDetails(Selected);
+            }
         }
         /// <summary>
         /// Enter task details into tab
@@ -100,35 +219,68 @@ namespace ToDo {
         /// <param name="edit">View edit mode</param>
         void EnterDetails(CustomButton CB = null, bool edit = false) {
             if (edit) {
-                grid2.Visibility = Visibility.Visible;
-                shgrid.Visibility = Visibility.Hidden;
+                ChangeMode(Mode.Edit);
                 if (CB == null) {
                     CreateButton.Visibility = Visibility.Visible;
                     SubmitButton.Visibility = Visibility.Hidden;
                     CTitle.Text = "";
-                    CDesc.Document.Blocks.Clear();
+                    CDesc.Clear();
                     Combo.SelectedValue = "";
-                    Deadline.SelectedDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 12, 0, 0);
-                    done.IsChecked = false;
+                    EdDeadline.Text = DayFilter.ToShortDateString();
+                    shdone.IsChecked = false;
                 } else {
                     CreateButton.Visibility = Visibility.Hidden;
                     SubmitButton.Visibility = Visibility.Visible;
                     CTitle.Text = CB.title;
-                    CDesc.Document.Blocks.Clear();
-                    CDesc.Document.Blocks.Add(new Paragraph(new Run(CB.description)));
+                    CDesc.Text = CB.description;
                     Combo.SelectedValue = CB.group;
-                    Deadline.SelectedDate = CB.deadline;
-                    done.IsChecked = CB.complete;
+                    EdDeadline.Text = CB.deadline.ToShortDateString();
+                    shdone.IsChecked = CB.complete;
                 }
             } else {
-                grid2.Visibility = Visibility.Hidden;
-                shgrid.Visibility = Visibility.Visible;
+                ChangeMode(Mode.View);
                 shTitle.Content = CB.title;
                 shdone.IsChecked = CB.complete;
                 shDesc.Text = CB.description;
                 shDeadline.Content = CB.deadline.ToString("dddd, dd MMMM yyyy");
                 shgroup.Content = CB.group;
             }
+        }
+
+        void ChangeMode(Mode mod) {
+            switch (mod) {
+                case Mode.Hide:
+                    gLabels.Visibility = Visibility.Hidden;
+                    gEdit.Visibility = Visibility.Hidden;
+                    gView.Visibility = Visibility.Hidden;
+                    shdone.Visibility = Visibility.Hidden;
+                    break;
+                case Mode.View:
+                    gLabels.Visibility = Visibility.Visible;
+                    gEdit.Visibility = Visibility.Hidden;
+                    gView.Visibility = Visibility.Visible;
+                    shdone.Visibility = Visibility.Visible;
+                    break;
+                case Mode.Edit:
+                    gLabels.Visibility = Visibility.Visible;
+                    gEdit.Visibility = Visibility.Visible;
+                    gView.Visibility = Visibility.Hidden;
+                    shdone.Visibility = Visibility.Visible;
+                    break;
+            }
+        }
+
+        private void SubMonth_Click(object sender, RoutedEventArgs e) {
+            monthOffset--;
+            DayFilter = DayFilter.AddMonths(-1);
+            CreateMonth();
+            Refresh();
+        }
+        private void AddMonth_Click(object sender, RoutedEventArgs e) {
+            monthOffset++;
+            DayFilter = DayFilter.AddMonths(1);
+            CreateMonth();
+            Refresh();
         }
         /// <summary>
         /// Reaction for Delete button
@@ -138,22 +290,24 @@ namespace ToDo {
                 return;
             }
             dataObject.DeleteTask(Selected.id, Selected.groupID);
-            Refresh_Click();
+            Refresh();
         }
         /// <summary>
         /// Reaction for Cancel button
         /// </summary>
         private void Cancel_Click(object sender, RoutedEventArgs e) {
-            grid2.Visibility = Visibility.Hidden;
-            shgrid.Visibility = Visibility.Visible;
+            if (Selected == null) {
+                ChangeMode(Mode.Hide);
+            } else {
+                ChangeMode(Mode.View);
+            }
         }
         /// <summary>
         /// Reaction for Add button
         /// </summary>
         private void Add_Click(object sender, RoutedEventArgs e) {
-            shgrid.Visibility = Visibility.Hidden;
-            grid2.Visibility = Visibility.Visible;
-            done.Visibility = Visibility.Hidden;
+            ChangeMode(Mode.Edit);
+            Selected = null;
             CreateButton.Visibility = Visibility.Visible;
             SubmitButton.Visibility = Visibility.Hidden;
             EnterDetails(null, true);
@@ -165,9 +319,7 @@ namespace ToDo {
             if (Selected == null) {
                 return;
             }
-            shgrid.Visibility = Visibility.Hidden;
-            grid2.Visibility = Visibility.Visible;
-            done.Visibility = Visibility.Visible;
+            ChangeMode(Mode.Edit);
             CreateButton.Visibility = Visibility.Hidden;
             SubmitButton.Visibility = Visibility.Visible;
             EnterDetails(Selected, true);
@@ -185,8 +337,8 @@ namespace ToDo {
                 MessageBox.Show("Group must have at least 1 character");
                 return false;
             }
-            if (Deadline.SelectedDate == null) {
-                MessageBox.Show("Deadline must be chosen");
+            if (!DateTime.TryParseExact(EdDeadline.Text, "d.MM.yyyy", CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out _)) {
+                MessageBox.Show("Deadline has an invalid format");
                 return false;
             }
             return true;
@@ -207,9 +359,9 @@ namespace ToDo {
                 RefreshGroups();
             }
             int Gid = groups.FirstOrDefault(x => x.Value == g).Key;
-            var str = new TextRange(CDesc.Document.ContentStart, CDesc.Document.ContentEnd);
-            dataObject.AddTask(CTitle.Text, Deadline.SelectedDate.Value, Gid, str.Text);
-            Refresh_Click();
+            var str = CDesc.Text;
+            dataObject.AddTask(CTitle.Text, DateTime.Parse(EdDeadline.Text), Gid, str);
+            Refresh();
         }
         /// <summary>
         /// Reaction for Submit button
@@ -226,12 +378,12 @@ namespace ToDo {
                 if (!dataObject.GroupExists(g)) {
                     dataObject.AddGroup(g);
                 }
-                RefreshGroups();
+                //RefreshGroups();
             }
             int Gid = groups.First(x => x.Value == g).Key;
-            var str = new TextRange(CDesc.Document.ContentStart, CDesc.Document.ContentEnd);
-            dataObject.UpdateTask(Selected.id, CTitle.Text, Deadline.SelectedDate.Value, done.IsChecked.Value, Gid, str.Text); ;
-            Refresh_Click();
+            var str = CDesc.Text;
+            dataObject.UpdateTask(Selected.id, CTitle.Text, DateTime.Parse(EdDeadline.Text), shdone.IsChecked.Value, Gid, str);
+            Refresh();
         }
         /// <summary>
         /// Reaction for changing filter group in ComboBox
@@ -239,7 +391,7 @@ namespace ToDo {
         private void Com_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             string g = Com.SelectedItem.ToString();
             filter = groups.FirstOrDefault(x => x.Value == g).Key;
-            Refresh_Click();
+            Refresh();
         }
 
         /// <summary>
@@ -250,7 +402,19 @@ namespace ToDo {
                 return;
             }
             dataObject.CompleteTask(Selected.id, shdone.IsChecked.Value);
-            Refresh_Click();
+            Refresh();
+        }
+
+        private void SelectDay_Click(object sender, RoutedEventArgs e) {
+            Button btn = (Button)sender;
+            DayFilter = new DateTime(selectedMonth.Year, selectedMonth.Month, int.Parse(btn.Name.Substring(6)));
+            if (gEdit.Visibility == Visibility.Visible) {
+                EdDeadline.Text = DayFilter.ToShortDateString();
+            }
+            HighlightButton();
+            if (DayFilterOn) {
+                Refresh();
+            }
         }
 
         /// <summary>
@@ -258,13 +422,8 @@ namespace ToDo {
         /// </summary>
         private void DayFilter_Click(object sender, RoutedEventArgs e) {
             DayFilterOn = DayCheckbox.IsChecked.Value;
-            if (DayFilterOn) {
-                Calendar.Visibility = Visibility.Visible;
-                Calendar.SelectedDate = DateTime.Now.Date;
-            } else {
-                Calendar.Visibility = Visibility.Collapsed;
-            }
-            Refresh_Click();
+            Refresh();
         }
+
     }
 }
