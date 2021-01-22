@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="ToDo.CustomCalendar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ToDo"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FF464646" Offset="0"/>
+                <GradientStop Color="#FF515151" Offset="0.15"/>
+                <GradientStop Color="#FF989CA0" Offset="0.28"/>
+                <GradientStop Color="#FF575757" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Button  Content='&lt;' Click="PrevMonth_Click" Background="{x:Null}" BorderBrush="#FF707070" Foreground="White" Margin="0" HorizontalAlignment="Left" Width="30" />
+        <Label x:Name="CalendarMonth" Foreground="White" FontSize="12" FontWeight="light" Width="Auto" Height="Auto" Margin="0,-5" Content="Styczeń" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Button  Content='&gt;' Click="NextMonth_Click" Background="{x:Null}" Foreground="White" Margin="0" HorizontalAlignment="Right" Width="30" />
+
+        <Grid Grid.Row="1" Name="calendarGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="14" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition Height="14"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="1" Grid.Row="0" Height="18" Width="25" Text="pon" VerticalAlignment="Top"/>
+            <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="2" Grid.Row="0" Height="18" Width="20" Text="wt"  VerticalAlignment="Top"/>
+            <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="3" Grid.Row="0" Height="18" Width="20" Text="śr"  VerticalAlignment="Top"/>
+            <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="4" Grid.Row="0" Height="18" Width="25" Text="czw" VerticalAlignment="Top"/>
+            <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="5" Grid.Row="0" Height="18" Width="25" Text="pią" VerticalAlignment="Top"/>
+            <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="6" Grid.Row="0" Height="18" Width="25" Text="sob" VerticalAlignment="Top"/>
+            <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="7" Grid.Row="0" Height="18" Width="25" Text="nie" VerticalAlignment="Top"/>
+        </Grid>
+    </Grid>
+</UserControl>
