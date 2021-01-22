@@ -95,8 +95,11 @@
     <Compile Include="CustomButton.xaml.cs">
       <DependentUpon>CustomButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomCalendar.xaml.cs">
+      <DependentUpon>CustomCalendar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools.cs" />
-    <Page Include="CustomCalendarDay.xaml">
+    <Page Include="CustomCalendar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -107,9 +110,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="CustomCalendarDay.xaml.cs">
-      <DependentUpon>CustomCalendarDay.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database.cs" />
     <Compile Include="MainWindow.xaml.cs">

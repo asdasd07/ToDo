@@ -49,12 +49,12 @@ namespace ToDo {
         /// <summary>
         /// Add a new record to Groups table
         /// </summary>
-        /// <param name="GroupName">New group name</param>
-        public void AddGroup(string GroupName) {
+        /// <param name="groupName">New group name</param>
+        public void AddGroup(string groupName) {
             OpenConnection();
             string query = "INSERT INTO Groups('name') VALUES(@name)";
             SQLiteCommand myCommand = new SQLiteCommand(query, myConnection);
-            myCommand.Parameters.AddWithValue("@name", GroupName);
+            myCommand.Parameters.AddWithValue("@name", groupName);
             myCommand.ExecuteNonQuery();
             CloseConnection();
         }
@@ -109,7 +109,7 @@ namespace ToDo {
         /// Mark Task as done or not
         /// </summary>
         /// <param name="id">ID of task</param>
-        /// <param name="done">is task done</param>
+        /// <param name="done">Is task done</param>
         public void CompleteTask(int id, bool done = true) {
             DateTime now = DateTime.Now;
             OpenConnection();
@@ -147,22 +147,22 @@ namespace ToDo {
         /// Delete Task record. If it was the last member of group, group also will be deleted
         /// </summary>
         /// <param name="id">ID of task</param>
-        /// <param name="Gid">GroupID of task</param>
-        public void DeleteTask(int id, int? Gid = null) {
+        /// <param name="gid">GroupID of task</param>
+        public void DeleteTask(int id, int? gid = null) {
             OpenConnection();
             string query = "delete from Tasks WHERE (ID = @ID)";
             SQLiteCommand myCommand = new SQLiteCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@ID", id);
             myCommand.ExecuteNonQuery();
-            if (Gid != null) {
+            if (gid != null) {
                 query = "select * from Tasks WHERE (groupid = @Gid)";
                 myCommand = new SQLiteCommand(query, myConnection);
-                myCommand.Parameters.AddWithValue("@Gid", Gid);
+                myCommand.Parameters.AddWithValue("@Gid", gid);
                 SQLiteDataReader result = myCommand.ExecuteReader();
                 if (!result.HasRows) {
                     query = "delete from groups WHERE (id = @Gid)";
                     myCommand = new SQLiteCommand(query, myConnection);
-                    myCommand.Parameters.AddWithValue("@Gid", Gid);
+                    myCommand.Parameters.AddWithValue("@Gid", gid);
                     myCommand.ExecuteNonQuery();
                 }
             }
@@ -171,31 +171,37 @@ namespace ToDo {
         /// <summary>
         /// Get filtered info from database
         /// </summary>
-        /// <param name="GID">Group ID filter. 0 - any group</param>
+        /// <param name="gid">Group ID filter. 0 - any group</param>
         /// <param name="day">Day filter. null - any day</param>
         /// <returns>Result of select</returns>
-        public SQLiteDataReader Select(int GID = 0, DateTime? day = null) {
+        public SQLiteDataReader Select(int gid = 0, DateTime? day = null) {
             string query = "SELECT tasks.id,Title,Description,CreationDate,EndDate,Deadline,Complete,GroupID,name FROM tasks, groups WHERE GroupID=groups.id";
-            if (GID != 0) query += " and groupID=@Gid";
+            if (gid != 0) query += " and groupID=@Gid";
             if (day != null) query += " and Deadline BETWEEN date(@Day) and date(@Day,'+1 day')";
             query += " order by Deadline";
             SQLiteCommand myCommand = new SQLiteCommand(query, myConnection);
-            if (GID != 0) myCommand.Parameters.AddWithValue("@Gid", GID);
+            if (gid != 0) myCommand.Parameters.AddWithValue("@Gid", gid);
             if (day != null) myCommand.Parameters.AddWithValue("@Day", day);
             OpenConnection();
             SQLiteDataReader result = myCommand.ExecuteReader();
             return result;
         }
-
-        public SQLiteDataReader Select(int GID, int month, int year) {
+        /// <summary>
+        /// Get filtered info from database
+        /// </summary>
+        /// <param name="gid">Group ID filter. 0 - any group</param>
+        /// <param name="month">Month filter</param>
+        /// <param name="year">Year filter</param>
+        /// <returns></returns>
+        public SQLiteDataReader Select(int gid, int month, int year) {
             DateTime begin = new DateTime(year, month, 1);
-            DateTime end = begin.AddMonths(1);
+            DateTime end = new DateTime(year, month, DateTime.DaysInMonth(year, month));
             string query = "SELECT tasks.id,Title,Description,CreationDate,EndDate,Deadline,Complete,GroupID,name FROM tasks, groups WHERE GroupID=groups.id";
-            if (GID != 0) query += " and groupID=@Gid";
+            if (gid != 0) query += " and groupID=@Gid";
             query += " and Deadline BETWEEN date(@BeginDate) and date(@EndDate,'+1 day')";
             query += " order by Complete, Deadline";
             SQLiteCommand myCommand = new SQLiteCommand(query, myConnection);
-            if (GID != 0) myCommand.Parameters.AddWithValue("@Gid", GID);
+            if (gid != 0) myCommand.Parameters.AddWithValue("@Gid", gid);
             myCommand.Parameters.AddWithValue("@BeginDate", begin);
             myCommand.Parameters.AddWithValue("@EndDate", end);
             OpenConnection();

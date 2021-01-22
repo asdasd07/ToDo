@@ -36,7 +36,7 @@ namespace ToDo {
             if (complete) {
                 Background = new SolidColorBrush(Colors.Gray) { Opacity = 0.5 };
             } else {
-                Background = Tools.getTaskBrush(groupID, id);
+                Background = Tools.GetTaskBrush(groupID, id);
             }
         }
     }

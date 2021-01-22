@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ToDo"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        xmlns:SQLite="clr-namespace:System.Data.SQLite;assembly=System.Data.SQLite"  xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"  xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="ToDo.MainWindow"
+        xmlns:SQLite="clr-namespace:System.Data.SQLite;assembly=System.Data.SQLite"  
+    xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"  
+    xmlns:System="clr-namespace:System;assembly=mscorlib" 
+    x:Class="ToDo.MainWindow"
         mc:Ignorable="d"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="ToDo" Height="610" Width="800">
@@ -20,101 +23,48 @@
                 <RowDefinition Height="4*"/>
                 <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
-            <CheckBox x:Name="DayCheckbox" Content="Filter by Day" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Click="DayFilter_Click" BorderBrush="{x:Null}" Foreground="White" Background="White"/>
+            <CheckBox x:Name="DayCheckbox" Content="Filter by Day" HorizontalAlignment="Right" Margin="0,10,10,0" VerticalAlignment="Top" Click="DayFilter_Click" Foreground="White"/>
+            <local:CustomCalendar x:Name="CCalendar" Grid.Row="0" Margin="0,40,10,0"/>
 
-            <Grid Grid.Row="0" Margin="0,40,10,0">
-                <Grid.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="#FF464646" Offset="0"/>
-                        <GradientStop Color="#FF515151" Offset="0.15"/>
-                        <GradientStop Color="#FF989CA0" Offset="0.28"/>
-                        <GradientStop Color="#FF575757" Offset="1"/>
-                    </LinearGradientBrush>
-                </Grid.Background>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-
-                <Button  Content='&lt;' Click="SubMonth_Click" Background="{x:Null}" BorderBrush="#FF707070" Foreground="White" Margin="0" HorizontalAlignment="Left" Width="30" />
-                <Label x:Name="CalendarMonth" Foreground="White" FontSize="12" FontWeight="light" Width="Auto" Height="Auto" Margin="0,-5" Content="Styczeń" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <Button  Content='&gt;' Click="AddMonth_Click" Background="{x:Null}" Foreground="White" Margin="0" HorizontalAlignment="Right" Width="30" />
-
-                <Grid Grid.Row="1" Name="calendarGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="14" />
-                        <ColumnDefinition Name="col0"/>
-                        <ColumnDefinition Name="col1"/>
-                        <ColumnDefinition Name="col2"/>
-                        <ColumnDefinition Name="col3"/>
-                        <ColumnDefinition Name="col4"/>
-                        <ColumnDefinition Name="col5"/>
-                        <ColumnDefinition Name="col6"/>
-                        <ColumnDefinition Width="14" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Name="row0" />
-                        <RowDefinition Name="row1" />
-                        <RowDefinition Name="row2" />
-                        <RowDefinition Name="row3" />
-                        <RowDefinition Name="row4" />
-                        <RowDefinition Name="row5" />
-                        <RowDefinition Height="14"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="1" Grid.Row="0" Height="18" Width="25" Text="pon" VerticalAlignment="Top"/>
-                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="2" Grid.Row="0" Height="18" Width="20" Text="wt"  VerticalAlignment="Top"/>
-                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="3" Grid.Row="0" Height="18" Width="20" Text="śr"  VerticalAlignment="Top"/>
-                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="4" Grid.Row="0" Height="18" Width="25" Text="czw" VerticalAlignment="Top"/>
-                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="5" Grid.Row="0" Height="18" Width="25" Text="pią" VerticalAlignment="Top"/>
-                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="6" Grid.Row="0" Height="18" Width="25" Text="sob" VerticalAlignment="Top"/>
-                    <TextBlock Foreground="#FFFFFFFF" FontSize="14" FontWeight="light"  Grid.Column="7" Grid.Row="0" Height="18" Width="25" Text="nie" VerticalAlignment="Top"/>
-                </Grid>
-            </Grid>
             <Grid x:Name="gEdit" Visibility="Visible" Grid.Row="1" MinHeight="285">
-                <TextBox x:Name="CDesc" MinWidth="50"  Margin="20,160,10,50" TextWrapping="Wrap" Text="TextBox" VerticalScrollBarVisibility="Auto" SpellCheck.IsEnabled="True" AcceptsTab="True" AcceptsReturn="True" BorderBrush="{x:Null}" Background="#FFA2A2A2" Foreground="Black"/>
-                <TextBox x:Name="CTitle" TextWrapping="Wrap" Text="TextBox" AutomationProperties.IsColumnHeader="True" Margin="70,45,20,0" VerticalAlignment="Top" MaxLength="30" MaxLines="1" Background="White"/>
-                <TextBox x:Name="EdDeadline" Text="TextBox" Margin="70,105,20,0" VerticalAlignment="Top" MaxLength="30" MaxLines="1" Background="White"/>
-                <ComboBox x:Name="Combo" IsEditable="True" Margin="70,72,20,0" VerticalAlignment="Top"  Background="#FFA2A2A2"/>
+                <TextBox x:Name="ETitle" TextWrapping="Wrap" Text="TextBox" AutomationProperties.IsColumnHeader="True" Margin="70,45,20,0" VerticalAlignment="Top" MaxLength="30" MaxLines="1" Background="White"/>
+                <ComboBox x:Name="ECombo" IsEditable="True" Margin="70,72,20,0" VerticalAlignment="Top"  />
+                <TextBox x:Name="EDeadline" Text="TextBox" Margin="70,105,20,0" VerticalAlignment="Top" MaxLength="30" MaxLines="1" Background="White"/>
+                <TextBox x:Name="EDesc" MinWidth="50" Margin="20,160,10,50" TextWrapping="Wrap" Text="TextBox" VerticalScrollBarVisibility="Auto" SpellCheck.IsEnabled="True" AcceptsTab="True" AcceptsReturn="True" Background="#FFA2A2A2" Foreground="Black"/>
                 <Button Content="Cancel" Width="75" Click="Cancel_Click" Margin="20,0,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
                 <Button x:Name="CreateButton" Content="Create" Width="75" Click="Create_Click" Margin="20,40,20,5" HorizontalAlignment="Right" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
                 <Button x:Name="SubmitButton" Content="Submit" Width="75" Click="Submit_Click" Margin="20,40,20,5" HorizontalAlignment="Right" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-                </Grid>
+            </Grid>
             <Grid x:Name="gLabels" Visibility="Visible" Grid.Row="1" Margin="0" MinHeight="250">
                 <Label Content="Title" Margin="0,40,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
                 <Label Content="Group" Margin="0,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
                 <Label Content="Deadline" Margin="0,100,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
                 <Label Content="Description:" Margin="0,130,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="White"/>
-                <CheckBox x:Name="shdone" Content="Done" Margin="0,15,20,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Click="Shdone_Click" Foreground="White"/>
+                <CheckBox x:Name="DoneCheckbox" Content="Done" Margin="0,15,20,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Click="Done_Click" Foreground="White"/>
             </Grid>
 
             <Grid x:Name="gView" Visibility="Hidden" Grid.Row="1" MinHeight="250">
                 <ScrollViewer Margin="20,160,10,60" VerticalScrollBarVisibility="Auto">
-                    <TextBlock x:Name="shDesc" TextWrapping="Wrap" Foreground="White" Margin="0,0,0,5"/>
+                    <TextBlock x:Name="VDesc" TextWrapping="Wrap" Foreground="White" Margin="0,0,0,5"/>
                 </ScrollViewer>
-                <Label x:Name="shTitle" Margin="70,40,20,0" VerticalAlignment="Top" Foreground="White"/>
-                <Label x:Name="shgroup" Margin="70,70,20,0" VerticalAlignment="Top" Foreground="White"/>
-                <Label x:Name="shDeadline" Margin="70,100,20,0" VerticalAlignment="Top" Foreground="White"/>
+                <Label x:Name="VTitle" Margin="70,40,20,0" VerticalAlignment="Top" Foreground="White"/>
+                <Label x:Name="VGroup" Margin="70,70,20,0" VerticalAlignment="Top" Foreground="White"/>
+                <Label x:Name="VDeadline" Margin="70,100,20,0" VerticalAlignment="Top" Foreground="White"/>
                 <Button x:Name="Edit" Content="Edit" Width="75" Margin="20,30,0,5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="Edit_Click"/>
             </Grid>
-
-
         </Grid>
 
-        <Grid x:Name="grid1" Grid.ColumnSpan="1" Margin="0" Grid.Column="0">
+        <Grid x:Name="gLeft" Grid.ColumnSpan="1" Margin="0" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <ListBox x:Name="LiBox" Margin="10,5,10,50" Padding="0" MinWidth="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" MinHeight="200" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionChanged="LiBox_SelectionChanged" Grid.Row="1" Grid.RowSpan="2" Focusable="False" Background="#FFA2A2A2" BorderBrush="{x:Null}"/>
+            <ListBox x:Name="TaskBox" Margin="10,5,10,50" Padding="0" MinWidth="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" MinHeight="200" VerticalContentAlignment="Top" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionChanged="TaskBox_SelectionChanged" Grid.Row="1" Grid.RowSpan="2" Focusable="False" Background="#FFA2A2A2" BorderBrush="{x:Null}"/>
             <Button x:Name="Add" Content="Add" HorizontalAlignment="Right" Margin="0,0,20,10" VerticalAlignment="Bottom" Width="75" Click="Add_Click" Grid.Row="1" Grid.RowSpan="2"/>
             <Button x:Name="Del" Content="Delete" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="75" Click="Del_Click" Margin="20,0,0,10" Grid.Row="1" Grid.RowSpan="2"/>
-            <ComboBox x:Name="Com" Width="140" Margin="0,10,10,0" HorizontalAlignment="Right" VerticalAlignment="Top" SelectionChanged="Com_SelectionChanged" Background="#FFA2A2A2"/>
+            <ComboBox x:Name="gFilter" Width="140" Margin="0,10,10,0" HorizontalAlignment="Right" VerticalAlignment="Top" SelectionChanged="gFilter_SelectionChanged" Background="#FFA2A2A2"/>
             <Label Content="Filter by Group" HorizontalAlignment="Left" Margin="10,10,0,5" VerticalAlignment="Top" Foreground="White"/>
-            </Grid>
-
-
+        </Grid>
     </Grid>
 </Window>
